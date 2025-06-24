@@ -1,0 +1,44 @@
+CREATE OR REPLACE PROCEDURE TransferFunds(
+  p_FromAccountID IN NUMBER,
+  p_ToAccountID   IN NUMBER,
+  p_Amount        IN NUMBER
+)
+IS
+  v_FromBalance NUMBER;
+  v_FromCustomer NUMBER;
+  v_ToCustomer   NUMBER;
+BEGIN
+  -- Check if both accounts belong to the same customer
+  SELECT CustomerID INTO v_FromCustomer FROM Accounts WHERE AccountID = p_FromAccountID;
+  SELECT CustomerID INTO v_ToCustomer   FROM Accounts WHERE AccountID = p_ToAccountID;
+
+  IF v_FromCustomer != v_ToCustomer THEN
+    RAISE_APPLICATION_ERROR(-20001, 'Accounts do not belong to the same customer.');
+  END IF;
+
+  -- Get balance
+  SELECT Balance INTO v_FromBalance FROM Accounts WHERE AccountID = p_FromAccountID;
+
+  IF v_FromBalance < p_Amount THEN
+    RAISE_APPLICATION_ERROR(-20002, 'Insufficient balance in source account.');
+  END IF;
+
+  -- Do the transfer
+  UPDATE Accounts SET Balance = Balance - p_Amount WHERE AccountID = p_FromAccountID;
+  UPDATE Accounts SET Balance = Balance + p_Amount WHERE AccountID = p_ToAccountID;
+
+  COMMIT;
+  DBMS_OUTPUT.PUT_LINE('Funds transferred successfully.');
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    DBMS_OUTPUT.PUT_LINE('Transfer failed: ' || SQLERRM);
+END;
+/
+
+
+-- Execute
+BEGIN
+  TransferFunds(1, 2, 100);
+END;
+/

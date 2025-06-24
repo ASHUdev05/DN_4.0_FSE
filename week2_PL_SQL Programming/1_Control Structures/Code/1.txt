@@ -1,0 +1,62 @@
+
+select * from Customers;
+select * from Loans;
+
+-- Scenario 1
+
+BEGIN
+  FOR cust_rec IN (
+    SELECT CustomerID
+    FROM Customers
+    WHERE TRUNC(MONTHS_BETWEEN(SYSDATE, DOB)/12) > 60
+  ) LOOP
+    UPDATE Loans
+    SET InterestRate = InterestRate - 1
+    WHERE CustomerID = cust_rec.CustomerID;
+  END LOOP;
+  COMMIT;
+END;
+/
+
+
+
+-- Scenario 2
+
+DECLARE
+  flag VARCHAR2(10);
+BEGIN
+  FOR cust_rec IN (
+    SELECT CustomerID, Name, Balance FROM Customers
+  ) LOOP
+    IF cust_rec.Balance > 10000 THEN
+      flag := 'TRUE';
+    ELSE
+      flag := 'FALSE';
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE('Customer: ' || cust_rec.Name || 
+                         ', Balance: ' || cust_rec.Balance || 
+                         ', IsVIP: ' || flag);
+  END LOOP;
+END;
+/
+
+
+
+
+
+-- Scenario 3
+
+BEGIN
+  FOR loan_rec IN (
+    SELECT L.LoanID, L.CustomerID, C.Name, L.EndDate
+    FROM Loans L
+    JOIN Customers C ON L.CustomerID = C.CustomerID
+    WHERE L.EndDate BETWEEN SYSDATE AND SYSDATE + 30
+  ) LOOP
+    DBMS_OUTPUT.PUT_LINE('Reminder: Loan ID ' || loan_rec.LoanID ||
+                         ' for customer ' || loan_rec.Name ||
+                         ' is due on ' || TO_CHAR(loan_rec.EndDate, 'YYYY-MM-DD'));
+  END LOOP;
+END;
+/
