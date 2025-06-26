@@ -1,0 +1,25 @@
+CREATE OR REPLACE FUNCTION CalculateMonthlyInstallment(
+  p_LoanAmount    NUMBER,
+  p_InterestRate  NUMBER,  -- Annual rate in percent (e.g., 6 for 6%)
+  p_DurationYears NUMBER
+)
+RETURN NUMBER
+IS
+  v_MonthlyRate NUMBER := p_InterestRate / 12 / 100;
+  v_NumMonths   NUMBER := p_DurationYears * 12;
+  v_EMI         NUMBER;
+BEGIN
+  IF v_MonthlyRate = 0 THEN
+    v_EMI := p_LoanAmount / v_NumMonths;
+  ELSE
+    v_EMI := p_LoanAmount * v_MonthlyRate * POWER(1 + v_MonthlyRate, v_NumMonths)
+             / (POWER(1 + v_MonthlyRate, v_NumMonths) - 1);
+  END IF;
+
+  RETURN ROUND(v_EMI, 2);
+END;
+/
+
+
+--Execute
+SELECT CalculateMonthlyInstallment(10000, 6, 2) AS Monthly_Installment FROM dual;
