@@ -1,0 +1,25 @@
+.app-container {
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.section-container {
+  margin-bottom: 20px;
+}
+
+.counter-display {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.button-style {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 8px 15px;
+  margin: 5px 0;
+  cursor: pointer;
+  display: block;
+  width: 120px;
+  text-align: center;
+  font-size: 14px;
+}

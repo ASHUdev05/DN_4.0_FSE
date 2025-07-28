@@ -1,0 +1,13 @@
+.book-details ul {
+  list-style: none;
+  padding: 0;
+}
+
+.book-details h3 {
+  margin-bottom: 5px;
+}
+
+.book-details h4 {
+  margin-top: 0;
+  color: #555;
+}
